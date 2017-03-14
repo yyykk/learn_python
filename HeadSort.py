@@ -1,21 +1,77 @@
 from queue import Queue
 
 class Tree:
-    Counter = 0
     def __init__(self, val = '#', left = None, right = None):
         self.val = val
-        self.counter = 0
         self.left = left
         self.right = right
         self.ponit = None
         self.father = None
-        Tree.Counter += 1
+        self.counter = 0 
 
+
+    #前序构建二叉树
+    def FrontBuildTree(self):
+        temp = input('Please Input: ')
+        node = Tree(temp)
+        if(temp != '#'):
+            node.left = self.FrontBuildTree()
+            node.right = self.FrontBuildTree()
+        return node#因为没有引用也没有指针，所以就把新的节点给返回回去
     
     #堆排序
     def HeadSort(self, List):
-         for i in range(len(List)):
-            self.BuildHeadTree(List[i])
+        for val in List:
+            print('val = ', val, 'self.counter = ', self.counter)
+            self.ponit = self.GetPoint()
+            print('self.ponit.val = ', self.ponit.val)  
+            if (self.counter == 0):
+                self.val = val
+                self.father = self
+            else:
+                temp = self.counter + 1
+                node = Tree(val)
+                node.father = self.ponit
+                if(temp % 2 == 0):
+                    self.ponit.left = node
+                else:
+                    self.ponit.right = node
+                while(temp != 0):
+                    if (node.val < node.father.val):
+                        p = node.father
+                        LeftTemp = node.left
+                        RightTemp = node.right
+                        if (p.father != p):
+                            if (int(temp / 2) % 2 == 0):
+                                p.father.left = node
+                            else:
+                                p.father.right = node
+                            node.father = p.father
+                        else:
+                            node.father = node
+                            node.counter = self.counter
+                            self = node 
+                        if(temp % 2 == 0):
+                            node.left = p
+                            node.right = p.right
+                            if (p.right != None):
+                                p.right.father = node
+                        else:
+                            node.left = p.left
+                            node.right = p
+                            if (p.left != None):
+                                p.left.father = node
+                        p.left = LeftTemp
+                        p.right = RightTemp
+                        p.father = node
+                        temp = int(temp / 2)
+                        print('node.val = ', node.val, 'node.father.val = ', node.father.val)
+                        print('Tree = ')
+                        self.VisitNode()
+                    else:
+                        break;
+            self.counter += 1
+        return self
            
     def GetPoint(self):
         dec = int((self.counter + 1) / 2)
@@ -36,34 +92,44 @@ class Tree:
             self.val = val
             self.father = self
         else:
+            temp = self.counter + 1
             node = Tree(val)
             node.father = self.ponit
-            if(self.counter % 2 == 0):
+            if(temp % 2 == 0):
                 self.ponit.left = node
             else:
                 self.ponit.right = node
-            temp = self.counter
             while(temp != 0):
                 if (node.val < node.father.val):
-                    if (temp == self.counter):
-                        self.ponit = node.father
-                    if (int(temp / 2) % 2 == 0):
-                        node.father.father.left = node
+                    p = node.father
+                    LeftTemp = node.left
+                    RightTemp = node.right
+                    if (p.father != p):
+                        if (int(temp / 2) % 2 == 0):
+                            p.father.left = node
+                        else:
+                            p.father.right = node
+                        node.father = p.father
                     else:
-                        node.father.father.right = node
+                        node.father = node
+                        node.counter = self.counter
+                        self = node 
                     if(temp % 2 == 0):
-                        node.left = node.father
+                        node.left = p
+                        node.right = p.right
                     else:
-                        node.left = node.father.left
-                        node.right = node.father
-                    node.father = node.father.father
+                        node.left = p.left
+                        node.right = p
+                    p.left = LeftTemp
+                    p.right = RightTemp
+                    p.father = node
                     temp = int(temp / 2)
                     print('node,val = ', node.val, 'node,father.val = ', node.father.val)
+                    print('Tree = ')
+                    self.VisitNode()
                 else:
                     break;
         self.counter += 1
-        print('Tree = ')
-        self.VisitNode()
                        
                 
 
@@ -78,5 +144,11 @@ class Tree:
 
 if __name__ == '__main__':
     root = Tree()
-    number = [2, 5, 4, 3, 1]
-    root.HeadSort(number)
+    number = [3, 5, 4, 3, 1, 6, 9]
+
+    root = root.HeadSort(number)
+    root.VisitNode()   
+    #root = root.FrontBuildTree()
+    #root.VisitNode()
+        
+        
